@@ -1,4 +1,4 @@
-from ROV2016 import PIDController
+from PyPID import PIDController
 pid = PIDController()
 pid.printMil()
 pid.printTunings()
