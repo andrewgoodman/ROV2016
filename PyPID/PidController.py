@@ -3,30 +3,39 @@ class PIDController:
     global millis
     
     def __init__(self):
-        global kp,ki,kd,lastTime,SampleTime,Setpoint,Input,lastInput
-        kp,ki,kd,lastTime,Setpoint,Input,lastInput =[0,0,0,0,0,0,0]
+        global isRunning,kp,ki,kd,lastTime,SampleTime,Setpoint,Input,lastInput,ITerm,outMin,outMax
+        kp,ki,kd,lastTime,Setpoint,Input,lastInput,ITerm,outMin,outMax=[0,0,0,0,0,0,0,0,0,0]
         SampleTime = 1000
-        
-
+        isRunning = True
     
     millis = lambda: int(round(time.time() * 1000))
 
     def Compute(self):
         global lastTime
         global lastInput
-        now = millis()
-        timeChange = now - lastTime
-        if timechange >= SampleTime:
-      
-            error = Setpoint - Input
-            errSum += error
-            dInput = Input - lastInput
+        global ITerm
+        if isRunning:
+            now = millis()
+            timeChange = now - lastTime
+            if timechange >= SampleTime:
           
-            Output = kp * error + ki * errSum + kd * dInput
-            return Output
-          
-            lastInput = Input
-            lastTime = now
+                error = Setpoint - Input
+                ITerm += ki*error
+                if ITerm>outMax:
+                    ITerm = outMax
+                elif ITerm < outMin:
+                    ITerm = outMin
+                dInput = Input - lastInput
+              
+                Output = kp * error + ITerm - kd * dInput
+                if Output > outMax:
+                    Output = outMax
+                elif Output < outMin:
+                    Output = outMin
+                return Output
+              
+                lastInput = Input
+                lastTime = now
           
     def setTunings(self,Kp,Ki,Kd,inputVar):
         global kp,ki,kd,Input
@@ -47,6 +56,23 @@ class PIDController:
     def setSetpoint(self, setpoint):
         global Setpoint
         Setpoint = setpoint
+
+    def SetOutputLimits(self,Min,Max):
+        global outMin,outMax
+        if Min < Max:
+            outMin = Min
+            outMax = Max
+
+    def setMode(self, Mode):
+        global isRunning
+        isRunning = Mode
+        
+        
+
+
+
+
+
 
     def printMil(self):
         print(millis())
