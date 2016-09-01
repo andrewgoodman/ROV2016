@@ -3,15 +3,8 @@ class PIDController:
     global millis
     
     def __init__(self):
-        global kp,ki,kd
-        global lastTime
-        global SampleTime
-        global Setpoint
-        global Input
-        Setpoint = 0
-        Input = 0
-        lastTime = 0
-        kp,ki,kd =[0,0,0]
+        global kp,ki,kd,lastTime,SampleTime,Setpoint,Input,lastInput
+        kp,ki,kd,lastTime,Setpoint,Input,lastInput =[0,0,0,0,0,0,0]
         SampleTime = 1000
         
 
@@ -20,18 +13,19 @@ class PIDController:
 
     def Compute(self):
         global lastTime
+        global lastInput
         now = millis()
         timeChange = now - lastTime
         if timechange >= SampleTime:
       
             error = Setpoint - Input
             errSum += error
-            dErr = error - lastErr
+            dInput = Input - lastInput
           
-            Output = kp * error + ki * errSum + kd * dErr
+            Output = kp * error + ki * errSum + kd * dInput
             return Output
           
-            lastErr = error
+            lastInput = Input
             lastTime = now
           
     def setTunings(self,Kp,Ki,Kd,inputVar):
